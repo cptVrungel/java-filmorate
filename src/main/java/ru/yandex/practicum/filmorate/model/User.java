@@ -12,13 +12,10 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @EqualsAndHashCode(of = {"id"})
-public class Film {
+public class User {
     private Integer id;
+    private String email;
+    private String login;
     private String name;
-    private String description;
-    private LocalDate releaseDate;
-    private int duration;
-
-    public Film() {
-    }
+    private LocalDate birthday;
 }
