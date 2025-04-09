@@ -3,12 +3,13 @@ package ru.yandex.practicum.filmorate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.yandex.practicum.filmorate.controller.FilmController;
+
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -16,8 +17,9 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@WebMvcTest(FilmController.class)
 class FilmorateApplicationTests {
 
 	@Autowired
@@ -28,12 +30,14 @@ class FilmorateApplicationTests {
 
 	private Film film1;
 	private Film film2;
+	private Film film3;
 
 
 	@BeforeEach
 	void setup() {
 		film1 = new Film();
 		film2 = new Film();
+		film3 = new Film();
 
 		film1.setName("X");
 		film1.setDescription("XX");
@@ -44,6 +48,11 @@ class FilmorateApplicationTests {
 		film2.setDescription("YY");
 		film2.setReleaseDate(LocalDate.of(2000, 04, 15));
 		film2.setDuration(300);
+
+		film3.setName("Z");
+		film3.setDescription("ZZ");
+		film3.setReleaseDate(LocalDate.of(2000, 04, 17));
+		film3.setDuration(400);
 	}
 
 
@@ -79,51 +88,59 @@ class FilmorateApplicationTests {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/films")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(film1)));
+				.content(objectMapper.writeValueAsString(film3)));
 
-		film1.setId(5);
-		film1.setName("XXXX");
-		film1.setDescription("YYYY");
-		film1.setReleaseDate(LocalDate.of(2000, 04, 12));
-		film1.setDuration(200);
+		film3.setId(5);
+		film3.setName("XXXX");
+		film3.setDescription("YYYY");
+		film3.setReleaseDate(LocalDate.of(2000, 04, 12));
+		film3.setDuration(200);
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/films")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(film1)))
+						.content(objectMapper.writeValueAsString(film3)))
 				.andExpect(status().isNotFound());
 
-		film1.setId(3);
-		film1.setName("");
+		film3.setId(null);
+		film3.setName("X");
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/films")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(film1)))
+						.content(objectMapper.writeValueAsString(film3)))
 				.andExpect(status().isBadRequest());
 
-		film1.setName("XXXX");
-		film1.setDescription("rwMGjiDQThxLDVrqADahjbavvuSQqVhzDWjcJQQtHIOzUZUKwzYzsqDRrNuKtoEMgRHaIWJg"
+		film3.setId(3);
+		film3.setName("");
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/films")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(film3)))
+				.andExpect(status().isBadRequest());
+
+		film3.setName("XXXX");
+		film3.setDescription("rwMGjiDQThxLDVrqADahjbavvuSQqVhzDWjcJQQtHIOzUZUKwzYzsqDRrNuKtoEMgRHaIWJg"
 				+ "QOuItLuKNqFImjkfaFZVVFQVlsgsVvxGcRLHrpJoNoGoPNSxakjexJdwQzvVIezyAiswIpGwfcikaNIfkWlx" +
 				"IAIkAprybEXZBvctMwNWzHbNPqvxyycrAddXKLsSEijltFmLYuSivu");
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/films")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(film1)))
+						.content(objectMapper.writeValueAsString(film3)))
 				.andExpect(status().isBadRequest());
 
-		film1.setDescription("YYYY");
-		film1.setReleaseDate(LocalDate.of(1736, 04, 12));
+		film3.setDescription("YYYY");
+		film3.setReleaseDate(LocalDate.of(1736, 04, 12));
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/films")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(film1)))
+						.content(objectMapper.writeValueAsString(film3)))
 				.andExpect(status().isBadRequest());
 
-		film1.setReleaseDate(LocalDate.of(2000, 04, 12));
-		film1.setDuration(-2);
+		film3.setReleaseDate(LocalDate.of(2000, 04, 12));
+		film3.setDuration(-2);
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/films")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(film1)))
+						.content(objectMapper.writeValueAsString(film3)))
 				.andExpect(status().isBadRequest());
 	}
 }
