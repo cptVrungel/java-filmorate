@@ -109,14 +109,6 @@ class FilmorateApplicationTests {
 						.content(objectMapper.writeValueAsString(film3)))
 				.andExpect(status().isBadRequest());
 
-		film3.setId(3);
-		film3.setName("");
-
-		mockMvc.perform(MockMvcRequestBuilders.put("/films")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(film3)))
-				.andExpect(status().isBadRequest());
-
 		film3.setName("XXXX");
 		film3.setDescription("rwMGjiDQThxLDVrqADahjbavvuSQqVhzDWjcJQQtHIOzUZUKwzYzsqDRrNuKtoEMgRHaIWJg"
 				+ "QOuItLuKNqFImjkfaFZVVFQVlsgsVvxGcRLHrpJoNoGoPNSxakjexJdwQzvVIezyAiswIpGwfcikaNIfkWlx" +

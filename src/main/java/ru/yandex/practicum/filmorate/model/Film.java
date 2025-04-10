@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,18 +22,18 @@ public class Film {
     @NotNull(groups = ForUpdate.class, message = "Не указан ID фильма !")
     private Integer id;
 
-    @NotBlank(groups = {ForUpdate.class, ForCreate.class}, message = "Название не может быть пустым !")
+    @NotBlank(groups = ForCreate.class, message = "Название не может быть пустым !")
     private String name;
 
-
+    @NotBlank(groups = ForCreate.class, message = "Не указано описание фильма !")
     @Size(groups = {ForUpdate.class, ForCreate.class}, max = LENGTHINESS, message = "Максимальная длина описания - 200 символов !")
     private String description;
 
-
+    @NotNull(groups = User.ForCreate.class, message = "Не задана дата релиза фильма !")
     private LocalDate releaseDate;
 
-
     @Positive(groups = {ForUpdate.class, ForCreate.class}, message = "Продолжительность фильма должна быть больше нуля !")
+    @NotNull(groups = User.ForCreate.class, message = "Не задана продолжительность фильма !")
     private int duration;
 
     @JsonIgnore

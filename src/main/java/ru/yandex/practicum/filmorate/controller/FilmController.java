@@ -19,25 +19,25 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@Validated(Film.ForCreate.class) @RequestBody Film film) {
-            film.setId(getNextId());
-            films.put(film.getId(), film);
-            log.info("Фильм успешно добавлен с ID {}", film.getId());
-            return film;
+        film.setId(getNextId());
+        films.put(film.getId(), film);
+        log.info("Фильм успешно добавлен с ID {}", film.getId());
+        return film;
     }
 
     @PutMapping
     public Film updateFilm(@Validated(Film.ForUpdate.class) @RequestBody Film newFilm) {
-            if (films.containsKey(newFilm.getId())) {
-                Film oldfilm = films.get(newFilm.getId());
-                oldfilm.setName(newFilm.getName());
-                oldfilm.setDescription(newFilm.getDescription());
-                oldfilm.setReleaseDate(newFilm.getReleaseDate());
-                oldfilm.setDuration(newFilm.getDuration());
-                log.info("Информация о фильме с ID {} успешно обновлена", oldfilm.getId());
-                return oldfilm;
-            } else {
-                throw new NotFoundException("Фильма с таким ID нет !");
-            }
+        if (films.containsKey(newFilm.getId())) {
+            Film oldfilm = films.get(newFilm.getId());
+            oldfilm.setName(newFilm.getName());
+            oldfilm.setDescription(newFilm.getDescription());
+            oldfilm.setReleaseDate(newFilm.getReleaseDate());
+            oldfilm.setDuration(newFilm.getDuration());
+            log.info("Информация о фильме с ID {} успешно обновлена", oldfilm.getId());
+            return oldfilm;
+        } else {
+            throw new NotFoundException("Фильма с таким ID нет !");
+        }
     }
 
     @GetMapping
