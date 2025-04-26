@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Optional;
 
@@ -20,6 +21,22 @@ public class ExceptionController {
     @ResponseBody
     public Response handleNotFoundException(NotFoundException exc) {
         log.error("Ошибка при поиске: {}", exc.getMessage());
+        return new Response(exc.getMessage());
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleValidationException(ValidationException exc) {
+        log.error("Ошибка при валидации: {}", exc.getMessage());
+        return new Response(exc.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exc) {
+        log.error("Некорректный ввод данных в запросе: {}", exc.getMessage());
         return new Response(exc.getMessage());
     }
 
