@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -26,7 +25,6 @@ public class UserService {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-        //user.setId(getNextId());
         userStorage.addUser(user);
         log.info("Пользователь с ID {} успешно добавлен", user.getId());
         return user;
@@ -81,18 +79,12 @@ public class UserService {
         if (!userStorage.checkUser(friendId)) {
             throw new NotFoundException("Пользователя c ID " + friendId + " нет !");
         }
-        if (friendId <= 0 || userId <= 0) {
-            throw new ValidationException("ID пользователей не может быть меньше 0 !");
-        }
         userStorage.deleteFriend(userId, friendId);
         log.info("Пользователи с ID {} и {} больше не друзья !", userId, friendId);
         return userStorage.getUserFriendList(userId);
     }
 
     public Set<User> getUserFriendList(Integer userId) {
-        if (userId <= 0) {
-            throw new ValidationException("ID пользователей не может быть меньше 0 !");
-        }
         if (userStorage.checkUser(userId)) {
             return userStorage.getUserFriendList(userId);
         } else {
@@ -101,9 +93,6 @@ public class UserService {
     }
 
     public Set<User> getCommonFriendList(Integer userId1, Integer userId2) {
-        if (userId1 <= 0 || userId2 <= 0) {
-            throw new ValidationException("ID пользователей не может быть меньше 0 !");
-        }
         if (!userStorage.checkUser(userId1)) {
             throw new NotFoundException("Пользователя c ID " + userId1 + " нет !");
         }

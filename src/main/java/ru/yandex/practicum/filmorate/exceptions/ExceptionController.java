@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +25,12 @@ public class ExceptionController {
         return new Response(exc.getMessage());
     }
 
-    @ExceptionHandler(ValidationException.class)
+    @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleValidationException(ValidationException exc) {
+    public Response handleConstraintViolationException(ConstraintViolationException exc) {
         log.error("Ошибка при валидации: {}", exc.getMessage());
-        return new Response(exc.getMessage());
+        return new Response("Передаваемые параметры должны быть больше 0");
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.Set;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -39,27 +41,30 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User getUserById(@PathVariable("userId") Integer userId) {
+    public User getUserById(@PathVariable("userId") @Min(1) Integer userId) {
         return userService.getUserById(userId);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
-    public Set<User> addFriend(@PathVariable("userId") Integer userId, @PathVariable("friendId") Integer friendId) {
+    public Set<User> addFriend(@PathVariable("userId") @Min(1) Integer userId,
+                               @PathVariable("friendId") @Min(1) Integer friendId) {
         return userService.addFriend(userId, friendId);
     }
 
     @GetMapping("/{userId}/friends")
-    public Set<User> getUserFriendList(@PathVariable("userId") Integer userId) {
+    public Set<User> getUserFriendList(@PathVariable("userId") @Min(1) Integer userId) {
         return userService.getUserFriendList(userId);
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public Set<User> deleteFriend(@PathVariable("userId") Integer userId, @PathVariable("friendId") Integer friendId) {
+    public Set<User> deleteFriend(@PathVariable("userId") @Min(1) Integer userId,
+                                  @PathVariable("friendId") @Min(1) Integer friendId) {
         return userService.deleteFriend(userId, friendId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Set<User> getCommonUserFriendList(@PathVariable("id") Integer id, @PathVariable("otherId") Integer otherId) {
+    public Set<User> getCommonUserFriendList(@PathVariable("id") @Min(1) Integer id,
+                                             @PathVariable("otherId") @Min(1) Integer otherId) {
         return userService.getCommonFriendList(id, otherId);
     }
 }

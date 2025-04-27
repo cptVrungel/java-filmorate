@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -56,9 +55,6 @@ public class FilmService {
         if (!userStorage.checkUser(userId)) {
             throw new NotFoundException("Пользователя с ID " + userId + " нет !");
         }
-        if (filmId <= 0 || userId <= 0) {
-            throw new ValidationException("ID фильма и пользователя не может быть меньше 0 !");
-        }
         filmStorage.addLike(filmId, userId);
         log.info("Пользователь с ID {} успешно лайкнул фильм с ID {}", userId, filmId);
         return filmStorage.getFilmLikes(filmId);
@@ -70,9 +66,6 @@ public class FilmService {
         }
         if (!userStorage.checkUser(userId)) {
             throw new NotFoundException("Пользователя с ID " + userId + " нет !");
-        }
-        if (filmId <= 0 || userId <= 0) {
-            throw new ValidationException("ID фильма и пользователя не может быть меньше 0 !");
         }
         filmStorage.deleteLike(filmId, userId);
         log.info("Удален лайк пользователя с ID {} фильму с ID {}", userId, filmId);
