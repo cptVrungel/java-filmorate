@@ -1,63 +1,70 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
     public User addUser(@Validated(User.ForCreate.class) @RequestBody User user) {
-            if (user.getName() == null || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            user.setId(getNextId());
-            users.put(user.getId(), user);
-            log.info("Пользователь с ID {} успешно добавлен", user.getId());
-            return user;
-        }
+        return userService.addUser(user);
+    }
 
 
     @PutMapping
     public User updateUser(@Validated(User.ForUpdate.class) @RequestBody User newUser) {
-            if (users.containsKey(newUser.getId())) {
-                User oldUser = users.get(newUser.getId());
-                if (newUser.getName() == null || newUser.getName().isBlank()) {
-                    oldUser.setName(newUser.getLogin());
-                } else {
-                    oldUser.setName(newUser.getName());
-                }
-                oldUser.setEmail(newUser.getEmail());
-                oldUser.setLogin(newUser.getLogin());
-                oldUser.setBirthday(newUser.getBirthday());
-                log.info("Информация о пользователе с ID {} успешно обновлена", oldUser.getId());
-                return oldUser;
-            } else {
-                throw new NotFoundException("Пользователя с таким ID нет !");
-            }
+        return userService.updateUser(newUser);
     }
 
     @GetMapping
-    public Collection<User> getAll() {
-        return users.values();
+    public Collection<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 
-    private Integer getNextId() {
-        Integer counter = users.keySet().stream()
-                .mapToInt(x -> x)
-                .max()
-                .orElse(0);
-        return ++counter;
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable("userId") @Min(1) Integer userId) {
+        return userService.getUserById(userId);
+    }
+
+    @PutMapping("/{userId}/friends/{friendId}")
+    public Set<User> addFriend(@PathVariable("userId") @Min(1) Integer userId,
+                               @PathVariable("friendId") @Min(1) Integer friendId) {
+        return userService.addFriend(userId, friendId);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public Set<User> getUserFriendList(@PathVariable("userId") @Min(1) Integer userId) {
+        return userService.getUserFriendList(userId);
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public Set<User> deleteFriend(@PathVariable("userId") @Min(1) Integer userId,
+                                  @PathVariable("friendId") @Min(1) Integer friendId) {
+        return userService.deleteFriend(userId, friendId);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Set<User> getCommonUserFriendList(@PathVariable("id") @Min(1) Integer id,
+                                             @PathVariable("otherId") @Min(1) Integer otherId) {
+        return userService.getCommonFriendList(id, otherId);
     }
 }

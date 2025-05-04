@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Optional;
 
@@ -20,6 +22,22 @@ public class ExceptionController {
     @ResponseBody
     public Response handleNotFoundException(NotFoundException exc) {
         log.error("Ошибка при поиске: {}", exc.getMessage());
+        return new Response(exc.getMessage());
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleConstraintViolationException(ConstraintViolationException exc) {
+        log.error("Ошибка при валидации: {}", exc.getMessage());
+        return new Response("Передаваемые параметры должны быть больше 0");
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exc) {
+        log.error("Некорректный ввод данных в запросе: {}", exc.getMessage());
         return new Response(exc.getMessage());
     }
 
