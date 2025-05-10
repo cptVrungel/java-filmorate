@@ -1,12 +1,16 @@
-package ru.yandex.practicum.filmorate.storage;
+/*package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@Qualifier("memory")
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Film> films = new HashMap<>();
@@ -61,6 +65,36 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void updateFilm(Film newFilm) {
+
+    }
+
+    @Override
+    public Genre getGenreById(Integer genreId) {
+        return null;
+    }
+
+    @Override
+    public Collection<Genre> getAllGenres() {
+        return List.of();
+    }
+
+    @Override
+    public Mpa getMpaById(Integer mpaId) {
+        return null;
+    }
+
+    @Override
+    public Collection<Mpa> getAllMpas() {
+        return List.of();
+    }
+
+    @Override
+    public Collection<Genre> getFilmGenres(Integer filmId) {
+        return List.of();
+    }
+
+    @Override
     public Collection<Film> getMostLikedFilms(Integer count) {
         if (likes.isEmpty()) {
             return Collections.emptyList();
@@ -82,5 +116,5 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .orElse(0);
         return ++counter;
     }
-}
+}*/
 

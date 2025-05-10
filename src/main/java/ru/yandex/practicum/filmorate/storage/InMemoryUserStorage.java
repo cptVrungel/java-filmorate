@@ -1,5 +1,6 @@
-package ru.yandex.practicum.filmorate.storage;
+/*package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -7,6 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@Qualifier("memory")
 public class InMemoryUserStorage implements UserStorage {
 
     private final Map<Integer, User> users = new HashMap<>();
@@ -34,16 +36,16 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public void updateUser(Integer id, User newUser) {
+
+    }
+
+    @Override
     public void addFriend(Integer userId, Integer friendId) {
         if (!friends.containsKey(userId)) {
             friends.put(userId, new HashSet<>());
         }
         friends.get(userId).add(users.get(friendId));
-
-        if (!friends.containsKey(friendId)) {
-            friends.put(friendId, new HashSet<>());
-        }
-        friends.get(friendId).add(users.get(userId));
     }
 
     @Override
@@ -52,11 +54,6 @@ public class InMemoryUserStorage implements UserStorage {
             return;
         }
         friends.get(userId).remove(users.get(friendId));
-
-        if (!friends.containsKey(friendId)) {
-            return;
-        }
-        friends.get(friendId).remove(users.get(userId));
     }
 
 
@@ -81,4 +78,4 @@ public class InMemoryUserStorage implements UserStorage {
                 .orElse(0);
         return ++counter;
     }
-}
+}*/
