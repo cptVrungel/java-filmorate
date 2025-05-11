@@ -24,16 +24,6 @@ public class Film {
     private List<Genre> genres;  // теперь список объектов Genre
     private Mpa mpa;
 
-    //private List<Integer> genre;
-
-    /*@Pattern(
-            regexp = "G|PG|PG-13|R|NC-17",
-            message = "Недопустимое значение рейтинга MPA! Доступные варианты: G, PG, PG-13, R, NC-17",
-            groups = {ForCreate.class, ForUpdate.class}
-    )
-    @NotBlank(groups = ForCreate.class, message = "Название рейтинга не может быть пустым !")
-    private String mpa;*/
-
     @NotBlank(message = "Не указано описание фильма !")
     @Size(max = LENGTHINESS, message = "Максимальная длина описания - 200 символов !")
     private String description;

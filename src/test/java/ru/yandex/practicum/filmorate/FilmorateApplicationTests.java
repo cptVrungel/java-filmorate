@@ -7,8 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.yandex.practicum.filmorate.DAL.FilmDbStorage;
-import ru.yandex.practicum.filmorate.DAL.UserDbStorage;
+import ru.yandex.practicum.filmorate.DAL.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -24,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({UserDbStorage.class, FilmDbStorage.class})
+@Import({UserDbStorage.class, FilmDbStorage.class, FilmsExtractor.class, FilmExtractor.class, UserRowMapper.class})
 class FilmorateApplicationTests {
 
 	private final UserDbStorage userStorage;

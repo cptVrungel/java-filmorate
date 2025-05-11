@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.DTO.FilmDTO;
@@ -25,7 +24,7 @@ public class FilmService {
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(@Qualifier("database") FilmStorage filmStorage, @Qualifier("database") UserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -60,13 +59,6 @@ public class FilmService {
 
     public FilmDTO updateFilm(Film film) {
         if (filmStorage.checkFilm(film.getId())) {
-            /*if(film.getMpa() != null &&
-                    (film.getMpa().getId() > 5 || film.getMpa().getId() < 0)){
-                throw new NotFoundException("Допустимые id mpa - от 1 до 5");
-            } else if (film.getGenres() != null && film.getGenres().stream()
-                    .allMatch(genre -> genre.getId() > 0 && genre.getId() < 7)) {
-                throw new NotFoundException("Допустимые id жанра - от 1 до 6");
-            }*/
             filmStorage.updateFilm(film);
             log.info("Информация о фильме с ID {} успешно обновлена", film.getId());
             return FilmMapperDTO.filmToFilmDTO(film);

@@ -1,9 +1,12 @@
 package ru.yandex.practicum.filmorate.model.DTO;
 
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.model.Film;
 
+@UtilityClass
 public class FilmMapperDTO {
-    public static Film requestToFilm(NewFilmRequest newFilmRequest) {
+
+    public Film requestToFilm(NewFilmRequest newFilmRequest) {
         Film film = new Film();
         film.setName(newFilmRequest.getName());
         film.setGenres(newFilmRequest.getGenres());
@@ -15,7 +18,7 @@ public class FilmMapperDTO {
         return film;
     }
 
-    public static FilmDTO filmToFilmDTO(Film film) {
+    public FilmDTO filmToFilmDTO(Film film) {
         FilmDTO filmDTO = new FilmDTO();
         filmDTO.setId(film.getId());
         filmDTO.setName(film.getName());

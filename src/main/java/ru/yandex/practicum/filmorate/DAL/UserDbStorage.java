@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.DAL;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,8 +10,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-@Qualifier("database")
 public class UserDbStorage implements UserStorage {
 
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
@@ -38,9 +34,9 @@ public class UserDbStorage implements UserStorage {
     protected final JdbcTemplate jdbc;
     protected final RowMapper<User> mapper;
 
-    public UserDbStorage(JdbcTemplate jdbc) {
+    public UserDbStorage(JdbcTemplate jdbc, UserRowMapper userRowMapper) {
         this.jdbc = jdbc;
-        this.mapper = new UserRowMapper();
+        this.mapper = userRowMapper;
     }
 
     @Override
@@ -137,19 +133,9 @@ public class UserDbStorage implements UserStorage {
             throw new InternalServerException("Не удалось сохранить данные");
         }
     }
-
-    @Component
-    public class UserRowMapper implements RowMapper<User> {
-        @Override
-        public User mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-            User user = new User();
-            user.setId(resultSet.getInt("user_id"));
-            user.setEmail(resultSet.getString("email"));
-            user.setLogin(resultSet.getString("login"));
-            user.setName(resultSet.getString("name"));
-            user.setBirthday(resultSet.getDate("birthday").toLocalDate());
-
-            return user;
-        }
-    }
 }
+
+
+
+
+

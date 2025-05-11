@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.DAL;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.InternalServerException;
@@ -13,19 +12,33 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.List;
 
 @Component
-@Qualifier("database")
 public class FilmDbStorage implements FilmStorage {
 
     //фильмы
-    private static final String FIND_ALL_FILMS = "SELECT * FROM films";
-    private static final String FIND_FILM_BY_ID = "SELECT * FROM films WHERE film_id = ?";
+    private static final String FIND_ALL_FILMS = "SELECT f.film_id, " +
+            "f.name, " +
+            "f.description, " +
+            "f.release_date, " +
+            "f.duration, " +
+            "f.mpa_id, " +
+            "m.name AS mpa_name, " +
+            "fg.genre_id, " +
+            "g.name AS genre_name " +
+            "FROM films f " +
+            "LEFT JOIN mpas m ON f.mpa_id = m.mpa_id " +
+            "LEFT JOIN film_genres fg ON f.film_id = fg.film_id " +
+            "LEFT JOIN genres g ON fg.genre_id = g.genre_id";
+    private static final String FIND_FILM_BY_ID = "SELECT f.*, m.mpa_id, m.name AS mpa_name, g.genre_id, g.name AS genre_name " +
+            "FROM films f " +
+            "LEFT JOIN mpas AS m ON f.mpa_id = m.mpa_id " +
+            "LEFT JOIN film_genres AS fg ON f.film_id = fg.film_id " +
+            "LEFT JOIN genres AS g ON fg.genre_id = g.genre_id " +
+            "WHERE f.film_id = ?";
     private static final String INSERT_FILM = "INSERT INTO films(name, description, release_date, duration) " +
             "VALUES (?, ?, ?, ?)";
     private static final String UPDATE_FILM = "UPDATE films SET name = ?, mpa_id = ?, " +
@@ -51,25 +64,40 @@ public class FilmDbStorage implements FilmStorage {
     private static final String GET_FILM_LIKE = "SELECT user_id from LIKES WHERE film_id = ?";
     private static final String ADD_LIKE = "MERGE INTO LIKES(film_id, user_id) KEY(film_id, user_id) VALUES (?, ?)";
     private static final String DELETE_LIKE = "DELETE FROM LIKES WHERE film_id = ? AND user_id = ?";
+
     private static final String GET_MOST_LIKED_FILMS =
-            "SELECT f.* " +
-                    "FROM films as f " +
-                    "LEFT JOIN likes as l ON f.film_id = l.film_id " +
-                    "GROUP BY f.film_id " +
-                    "ORDER BY COUNT(l.user_id) DESC " +
+            "SELECT f.film_id, " +
+                    "f.name, " +
+                    "f.description, " +
+                    "f.release_date, " +
+                    "f.duration, " +
+                    "f.mpa_id, " +
+                    "m.name AS mpa_name, " +
+                    "fg.genre_id, " +
+                    "g.name AS genre_name, " +
+                    "COUNT(DISTINCT l.user_id) AS like_count " +
+                    "FROM films f " +
+                    "LEFT JOIN mpas m ON f.mpa_id = m.mpa_id " +
+                    "LEFT JOIN film_genres fg ON f.film_id = fg.film_id " +
+                    "LEFT JOIN genres g ON fg.genre_id = g.genre_id " +
+                    "LEFT JOIN likes l ON f.film_id = l.film_id " +
+                    "GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_id, m.name, fg.genre_id, g.name " +
+                    "ORDER BY like_count DESC " +
                     "LIMIT ?";
     protected final JdbcTemplate jdbc;
-    protected final RowMapper<Film> mapper;
+    protected final ResultSetExtractor<Film> filmExtractor;
+    protected final ResultSetExtractor<Collection<Film>> filmsExtractor;
 
-    public FilmDbStorage(JdbcTemplate jdbc) {
+    public FilmDbStorage(JdbcTemplate jdbc, FilmExtractor filmExtractor, FilmsExtractor filmsExtractor) {
         this.jdbc = jdbc;
-        this.mapper = new FilmRowMapper();
+        this.filmExtractor = filmExtractor;
+        this.filmsExtractor = filmsExtractor;
     }
 
     @Override
     public boolean checkFilm(Integer id) {
         try {
-            Film film = jdbc.queryForObject(FIND_FILM_BY_ID, mapper, id);
+            Film film = jdbc.query(FIND_FILM_BY_ID, filmExtractor, id);
             return true;
         } catch (EmptyResultDataAccessException ignored) {
             return false;
@@ -78,12 +106,13 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(Integer id) {
-        return jdbc.queryForObject(FIND_FILM_BY_ID, mapper, id);
+        return jdbc.query(FIND_FILM_BY_ID, filmExtractor, id);
     }
 
     @Override
     public Collection<Film> getAllFilms() {
-        return jdbc.query(FIND_ALL_FILMS, mapper);
+        System.out.println("lalala");
+        return jdbc.query(FIND_ALL_FILMS, filmsExtractor);
     }
 
     @Override
@@ -125,7 +154,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getMostLikedFilms(Integer count) {
-        return jdbc.query(GET_MOST_LIKED_FILMS, mapper, count);
+        return jdbc.query(GET_MOST_LIKED_FILMS, filmsExtractor, count);
     }
 
     private void save(Film newFilm) {
@@ -219,34 +248,6 @@ public class FilmDbStorage implements FilmStorage {
     public void insertFilmMpa(Integer filmId, Mpa mpa) {
         if (mpa != null) {
             jdbc.update(INSERT_FILM_MPA, mpa.getId(), filmId);
-        }
-    }
-
-    @Component
-    public class FilmRowMapper implements RowMapper<Film> {
-        @Override
-        public Film mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-            Film film = new Film();
-            film.setId(resultSet.getInt("film_id"));
-            film.setName(resultSet.getString("name"));
-            film.setDescription(resultSet.getString("description"));
-            film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
-            film.setDuration(resultSet.getInt("duration"));
-
-            Integer mpaId = resultSet.getObject("mpa_id", Integer.class);
-            Mpa mpa = null;
-            if (mpaId != null) {
-                try {
-                    mpa = getMpaById(mpaId);
-                } catch (EmptyResultDataAccessException e) {
-                    mpa = null;
-                }
-            }
-            film.setMpa(mpa);
-
-            film.setGenres(getFilmGenres(resultSet.getInt("film_id")));
-
-            return film;
         }
     }
 }
