@@ -1,19 +1,12 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.DTO;
 
 import jakarta.validation.constraints.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@EqualsAndHashCode(of = {"id"})
-public class User {
-
-    @NotNull(message = "Не указан ID пользователя !")
-    private Integer id;
+@Data
+public class NewUserRequest {
 
     @Email(message = "Неверный формат электронной почты !")
     @NotBlank(message = "Не указана почта пользователя !")
@@ -30,11 +23,7 @@ public class User {
     @NotNull(message = "Не задана дата рождения !")
     private LocalDate birthday;
 
-    public User() {
+    public NewUserRequest() {
     }
 
-    public interface ForUpdate {}
-
-    public interface ForCreate {
-    }
 }
